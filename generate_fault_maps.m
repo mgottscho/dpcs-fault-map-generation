@@ -59,7 +59,7 @@ display(['Generating ' num2str(map_numbers(size(map_numbers,2))) ' fault maps...
 display(['Cache config: ' num2str(cache_size_bits) ' bits, ' num2str(associativity) '-way, ' num2str(sets) ' sets, ' num2str(bits_per_block) ' bits/block']);
 
 % Read the file, init
-raw_file_input = csvread(ber_filename, 1, 0);
+raw_file_input = csvread(filename, 1, 0);
 vdd_ber_cdf = raw_file_input(:,1:2:3); % Extract just VDD and block error rates from input. These correspond to columns 1 and 3, respectively.
 
 % Generate the fault maps and optionally output to files
