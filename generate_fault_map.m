@@ -3,8 +3,6 @@ function [faultmap] = generate_fault_map(vdd_block_fault_cdf, cache_size_bits, a
 % mgottscho@ucla.edu
 % 
 % This function computes the minimum non-faulty VDD for each cache block.
-% See the README for more details on expected file formats in the dpcs-gem5
-% framework.
 %
 % Arguments:
 %   vdd_block_fault_cdf -- Nx2 matrix where column 1 is the VDD and column 2 is the cumulative block error rate

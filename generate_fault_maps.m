@@ -1,4 +1,4 @@
-function [faultmaps, vdd_mins, vdd_mins_nonfaulty] = generate_fault_maps(ber_filename, cache_size_bits, associativity, bits_per_block, map_numbers, output_enable, output_dir, cache_ID, config_ID)
+function [faultmaps, vdd_mins, vdd_mins_nonfaulty] = generate_fault_maps(filename, cache_size_bits, associativity, bits_per_block, map_numbers, output_enable, output_dir, cache_ID, config_ID)
 % Author: Mark Gottscho
 % mgottscho@ucla.edu
 %
@@ -6,7 +6,7 @@ function [faultmaps, vdd_mins, vdd_mins_nonfaulty] = generate_fault_maps(ber_fil
 % gem5 simulation.
 %
 % Arguments:
-%   ber_filename -- the CSV file to read
+%   filename -- the CSV file to read
 %   cache_size_bits -- total cache size in bits
 %   associativity -- cache associativity
 %   bits_per_block -- number of bits in each cache block
@@ -51,9 +51,6 @@ function [faultmaps, vdd_mins, vdd_mins_nonfaulty] = generate_fault_maps(ber_fil
 % The fault rates specified in the input file should match those of the block size parameter.
 % For example, if the bits_per_block parameter is 512, then each BER in the input file should be probabilities
 % of failure for a 512-bit chunk.
-%
-% See the README for more details on expected file formats in the dpcs-gem5
-% framework.
 
 sets = cache_size_bits/(associativity * bits_per_block);
 
@@ -63,7 +60,7 @@ display(['Cache config: ' num2str(cache_size_bits) ' bits, ' num2str(associativi
 
 % Read the file, init
 raw_file_input = csvread(ber_filename, 1, 0);
-vdd_ber_cdf = raw_file_input(:,1:2); % Extract just VDD and block error rates from input
+vdd_ber_cdf = raw_file_input(:,1:2:3); % Extract just VDD and block error rates from input. These correspond to columns 1 and 3, respectively.
 
 % Generate the fault maps and optionally output to files
 faultmaps = NaN(sets, associativity, map_numbers(size(map_numbers,2))); % Allocate a 3D matrix. Each Z plane is one faultmap. Z indices correspond to map_number indices that were input.
