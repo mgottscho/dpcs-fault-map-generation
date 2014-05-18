@@ -1,4 +1,4 @@
-function [] = plot_blockwise_vddmin(faultmap_set, block_error_rate_cdf)
+function [] = plot_blockwise_vddmin(faultmap_set)
 % Author: Mark Gottscho
 % mgottscho@ucla.edu
 
@@ -13,13 +13,14 @@ block_error_rate_pmf(:,1) = block_error_rate_cdf(1:90,1);
 block_error_rate_pmf(:,1) = block_error_rate_pmf(:,1) + 10;
 
 % Plot the PMF function against the histogram of results
-figure;
-hold on;
 plot(block_error_rate_pmf(:,1), block_error_rate_pmf(:,2));
+hold on;
 bar(binvalues, normcounts);
 
 % Axis labels
 xlabel('Block min-VDD (mV)');
 ylabel('Relative Frequency');
+
+hold off;
 
 end
