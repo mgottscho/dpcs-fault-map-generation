@@ -1,4 +1,4 @@
-function [faultmap_samples, vdd_min_samples, faultmap_sample_indices] = extract_five_faultmaps_for_simulation(vdd_mins, block_faultmaps, output_dir, cache_ID, config_ID);
+function [faultmap_samples, vdd_min_samples, faultmap_sample_indices] = extract_five_faultmaps_for_simulation(vdd_mins, block_faultmaps, output_dir, cache_ID, config_ID)
 % Author: Mark Gottscho
 % mgottscho@ucla.edu
 %
