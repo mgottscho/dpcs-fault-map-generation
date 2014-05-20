@@ -32,13 +32,15 @@ function [faultmap_samples, vdd_min_samples, faultmap_sample_indices] = extract_
 %       format as block_faultmaps, but instance (index) i in
 %       faultmap_samples is not the same instance (index) j in the input
 %       arguments.
+%   vdd_min_samples -- A 1xN row vector, where each entry contains the min
+%       cache VDD for that sample.
 %   faultmap_sample_numbers -- A 1x5 row vector. This maps the input fault
 %       map indices to those in the faultmap_samples output.
 %
 % Side effects:
 %   Writes 5 CSV files to the faultmaps/ sub-directory, of the form:
 %
-%   <output_dir>/faultmap-<cache_ID>-<config_ID>-<map_number>.csv
+%   <output_dir>/faultmap-<cache_ID>-<config_ID>-<map_number>-<original_faultmap_sample_number>.csv
 %
 %   Where each entry represents a single block.
 %
@@ -48,11 +50,11 @@ function [faultmap_samples, vdd_min_samples, faultmap_sample_indices] = extract_
 %       config_ID = 'foo'
 %
 %   The following files will be produced:
-%       faultmaps/faultmap-L2-foo-<faultmap_sample_numbers(1)>.csv
-%       faultmaps/faultmap-L2-foo-<faultmap_sample_numbers(2)>.csv
-%       faultmaps/faultmap-L2-foo-<faultmap_sample_numbers(3)>.csv
-%       faultmaps/faultmap-L2-foo-<faultmap_sample_numbers(4)>.csv
-%       faultmaps/faultmap-L2-foo-<faultmap_sample_numbers(5)>.csv
+%       faultmaps/faultmap-L2-foo-1-<faultmap_sample_numbers(1)>.csv
+%       faultmaps/faultmap-L2-foo-2-<faultmap_sample_numbers(2)>.csv
+%       faultmaps/faultmap-L2-foo-3-<faultmap_sample_numbers(3)>.csv
+%       faultmaps/faultmap-L2-foo-4-<faultmap_sample_numbers(4)>.csv
+%       faultmaps/faultmap-L2-foo-5-<faultmap_sample_numbers(5)>.csv
 
 
 % Error checking
@@ -81,9 +83,8 @@ for i=2:5
     faultmap_samples(:,:,i) = block_faultmaps(:,:,faultmap_sample_indices(i)); % (25th, 50th, 75th, and 100th %iles)
 end
 
-mkdir(output_dir);
 for i=1:5
-   csvwrite([output_dir '/faultmap-' cache_ID '-' config_ID '-' num2str(faultmap_sample_indices(i)) '.csv'], faultmap_samples(:,:,i)); 
+   csvwrite([output_dir '/faultmap-' cache_ID '-' config_ID '-' num2str(i) '-' num2str(faultmap_sample_indices(i)) '.csv'], faultmap_samples(:,:,i)); 
 end
 
 end
