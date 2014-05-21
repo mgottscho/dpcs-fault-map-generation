@@ -29,7 +29,7 @@ function [] = export_faultmaps(faultmaps, faultmap_IDs, output_dir, cache_ID, co
 
 N = size(faultmaps,3);
 for i=1:N
-    csvwrite([output_dir '/faultmap-' cache_ID '-' config_ID '-' num2str(faultmap_IDs(i)) '.csv'], faultmaps(i));
+    csvwrite([output_dir '/faultmap-' cache_ID '-' config_ID '-' num2str(i) '-' num2str(faultmap_IDs(i)) '.csv'], faultmaps(:,:,i));
 end
 
 end

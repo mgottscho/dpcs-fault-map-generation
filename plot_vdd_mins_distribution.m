@@ -46,7 +46,6 @@ for i=1:C
 end
 
 % Plot histogram
-figure;
 myfig = bar(binvalues, normcounts);
 
 % Set colors and legend labels
