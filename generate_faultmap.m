@@ -47,5 +47,5 @@ end
 % Compute both vdd-min cases on the generated faultmap
 vdd_min_per_set = min(faultmap, [], 2); % For each set, compute what the minimum VDD is. This is due to the constraint that each set must have at least one non-faulty block.
 vdd_min = max(vdd_min_per_set); % Take the maximum of setwise vdd mins for correct operation
-vdd_min_nofaults = max(faultmap(:)); % min-VDD for a baseline non-faulty cache is the maximum of each block's min-VDD
+vdd_min_nofaults = max(max(faultmap)); % min-VDD for a baseline non-faulty cache is the maximum of each block's min-VDD
     
