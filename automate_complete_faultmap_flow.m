@@ -12,12 +12,13 @@ capacity_levels = [1 0.99 0.75]; % Runtime VDD levels for each cache should be s
 
 % Read in the voltage parameter files
 display('Reading in voltage parameter files...');
-vdd_block_fault_cdf_L1_A = parse_voltage_parameter_file('parameters/gem5params-L1-A.csv');
-vdd_block_fault_cdf_L2_A = parse_voltage_parameter_file('parameters/gem5params-L2-A.csv');
-vdd_block_fault_cdf_L1_B = parse_voltage_parameter_file('parameters/gem5params-L1-B.csv');
-vdd_block_fault_cdf_L2_B = parse_voltage_parameter_file('parameters/gem5params-L2-B.csv');
+[vdd_block_fault_cdf_L1_A, vdd_power_energy_L1_A] = parse_voltage_parameter_file('parameters/fmparams-L1-A.csv');
+[vdd_block_fault_cdf_L2_A, vdd_power_energy_L2_A] = parse_voltage_parameter_file('parameters/fmparams-L2-A.csv');
+[vdd_block_fault_cdf_L1_B, vdd_power_energy_L1_B] = parse_voltage_parameter_file('parameters/fmparams-L1-B.csv');
+[vdd_block_fault_cdf_L2_B, vdd_power_energy_L2_B] = parse_voltage_parameter_file('parameters/fmparams-L2-B.csv');
 
-% Set up cache dimensions
+% Set up cache dimensions -- FIXME: These should probably be input
+% parameters
 display('Configuring cache dimensions...');
 cache_size_bits_L1_A = 64*2^10*8;
 cache_size_bits_L2_A = 2*2^20*8;
@@ -107,10 +108,10 @@ selected_vdd_mins_L2_B = vdd_mins_L2_B(selected_indices_L2_B);
 
 % Determine runtime VDDs
 display('Determining runtime VDDs for simulation...');
-[runtime_vdds_L1_A, yield_limited_L1_A, voltage_capacities_L1_A] = determine_runtime_vdds(selected_faultmaps_L1_A, selected_vdd_mins_L1_A, vdd_nom, vdd_nom:-vdd_increment:100, capacity_levels);
-[runtime_vdds_L2_A, yield_limited_L2_A, voltage_capacities_L2_A] = determine_runtime_vdds(selected_faultmaps_L2_A, selected_vdd_mins_L2_A, vdd_nom, vdd_nom:-vdd_increment:100, capacity_levels);
-[runtime_vdds_L1_B, yield_limited_L1_B, voltage_capacities_L1_B] = determine_runtime_vdds(selected_faultmaps_L1_B, selected_vdd_mins_L1_B, vdd_nom, vdd_nom:-vdd_increment:100, capacity_levels);
-[runtime_vdds_L2_B, yield_limited_L2_B, voltage_capacities_L2_B] = determine_runtime_vdds(selected_faultmaps_L2_B, selected_vdd_mins_L2_B, vdd_nom, vdd_nom:-vdd_increment:100, capacity_levels);
+[runtime_vdds_L1_A, yield_limited_L1_A, voltage_capacities_power_energy_L1_A] = determine_runtime_vdds(selected_faultmaps_L1_A, selected_vdd_mins_L1_A, vdd_nom, vdd_nom:-vdd_increment:100, capacity_levels, vdd_power_energy_L1_A);
+[runtime_vdds_L2_A, yield_limited_L2_A, voltage_capacities_power_energy_L2_A] = determine_runtime_vdds(selected_faultmaps_L2_A, selected_vdd_mins_L2_A, vdd_nom, vdd_nom:-vdd_increment:100, capacity_levels, vdd_power_energy_L2_A);
+[runtime_vdds_L1_B, yield_limited_L1_B, voltage_capacities_power_energy_L1_B] = determine_runtime_vdds(selected_faultmaps_L1_B, selected_vdd_mins_L1_B, vdd_nom, vdd_nom:-vdd_increment:100, capacity_levels, vdd_power_energy_L1_B);
+[runtime_vdds_L2_B, yield_limited_L2_B, voltage_capacities_power_energy_L2_B] = determine_runtime_vdds(selected_faultmaps_L2_B, selected_vdd_mins_L2_B, vdd_nom, vdd_nom:-vdd_increment:100, capacity_levels, vdd_power_energy_L2_B);
 
 % Export selected faultmaps for gem5 simulation
 display('Exporting CSVs for selected faultmaps...');
@@ -119,9 +120,9 @@ export_faultmaps(selected_faultmaps_L1_A, selected_indices_L1_A, 'faultmaps', 'L
 export_faultmaps(selected_faultmaps_L2_A, selected_indices_L2_A, 'faultmaps', 'L2', 'A');
 export_faultmaps(selected_faultmaps_L1_B, selected_indices_L1_B, 'faultmaps', 'L1', 'B');
 export_faultmaps(selected_faultmaps_L2_B, selected_indices_L2_B, 'faultmaps', 'L2', 'B');
-export_runtime_vdds(runtime_vdds_L1_A, selected_indices_L1_A, 'faultmaps', 'L1', 'A');
-export_runtime_vdds(runtime_vdds_L2_A, selected_indices_L2_A, 'faultmaps', 'L2', 'A');
-export_runtime_vdds(runtime_vdds_L1_B, selected_indices_L1_B, 'faultmaps', 'L1', 'B');
-export_runtime_vdds(runtime_vdds_L2_B, selected_indices_L2_B, 'faultmaps', 'L2', 'B');
+export_runtime_vdds(runtime_vdds_L1_A, voltage_capacities_power_energy_L1_A, selected_indices_L1_A, 'faultmaps', 'L1', 'A');
+export_runtime_vdds(runtime_vdds_L2_A, voltage_capacities_power_energy_L2_A, selected_indices_L2_A, 'faultmaps', 'L2', 'A');
+export_runtime_vdds(runtime_vdds_L1_B, voltage_capacities_power_energy_L1_B, selected_indices_L1_B, 'faultmaps', 'L1', 'B');
+export_runtime_vdds(runtime_vdds_L2_B, voltage_capacities_power_energy_L2_B, selected_indices_L2_B, 'faultmaps', 'L2', 'B');
 
 display('DONE!');

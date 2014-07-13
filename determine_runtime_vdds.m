@@ -1,4 +1,4 @@
-function [runtime_vdds, yield_limited, voltage_capacities] = determine_runtime_vdds(faultmaps, vdd_mins, vdd_nom, possible_vdds, capacity_levels)
+function [runtime_vdds, yield_limited, voltage_capacities_power_energy] = determine_runtime_vdds(faultmaps, vdd_mins, vdd_nom, possible_vdds, capacity_levels, vdd_power_energy)
 % Author: Mark Gottscho
 % mgottscho@ucla.edu
 %
@@ -17,6 +17,10 @@ function [runtime_vdds, yield_limited, voltage_capacities] = determine_runtime_v
 %       minimum proportion of NON-faulty blocks that must be available at that
 %       voltage. For example, for VDD1 requirement of at least 50%
 %       non-faulty blocks, then capacity_levels(1) = 0.5.
+%   vdd_power_energy -- Mx4 Matrix: column 1 is VDD values, column 2 is
+%       static power per data block, column 3 is static power for everything but data blocks,
+%       and column 4 is total dynamic cache energy per
+%       access
 %       
 % Returns:
 %   runtime_vdds -- 1xLxN Matrix: each element in a Z-plane corresponds to a runtime
@@ -27,19 +31,22 @@ function [runtime_vdds, yield_limited, voltage_capacities] = determine_runtime_v
 %   yield_limited -- 1xLxN Matrix: if any of the runtime VDDs are limited
 %       by the min-VDD constraint rather than the input capacity level,
 %       then the corresponding yield_limited flag will be set for that VDD level.
-%   voltage_capacities -- Vx3xN Matrix: Rows correspond to all
+%   voltage_capacities_power_energy -- Vx5xN Matrix: Rows correspond to all
 %       possible operating VDD levels as seen by their occurrences in the
 %       input faultmap.
 %           Column 1: the vdd level
 %           Column 2: the number of faulty blocks at that vdd level
 %           Column 3: the fractional cache capacity at that vdd level
+%           Column 4: the total cache static power at that vdd level
+%           Column 5: the total cache dynamic energy per access at that vdd
+%           level
 
 % Set up some variables
 N = size(faultmaps, 3);
 L = size(capacity_levels, 2); % number of runtime vdds
 V = size(possible_vdds, 2); % number of possible vdds
 num_blocks = size(faultmaps, 1) * size(faultmaps, 2); % number of blocks in a faultmap
-voltage_capacities = NaN(V, 3, N);
+voltage_capacities_power_energy = NaN(V, 5, N);
 runtime_vdds = NaN(L, 1, N); 
 yield_limited = NaN(L, 1, N);
 
@@ -63,9 +70,11 @@ end
 for i=1:N
     % loop over all voltages
     for j=1:V
-        voltage_capacities(j,1,i) = possible_vdds(j); % record voltages
-        voltage_capacities(j,2,i) = sum(sum(faultmaps(:,:,i) > possible_vdds(j))); % Count number of blocks that would be faulty at each voltage
-        voltage_capacities(j,3,i) = (num_blocks - voltage_capacities(j,2,i)) / num_blocks; % compute effective capacity at each voltage
+        voltage_capacities_power_energy(j,1,i) = possible_vdds(j); % record voltages
+        voltage_capacities_power_energy(j,2,i) = sum(sum(faultmaps(:,:,i) > possible_vdds(j))); % Count number of blocks that would be faulty at each voltage
+        voltage_capacities_power_energy(j,3,i) = (num_blocks - voltage_capacities_power_energy(j,2,i)) / num_blocks; % compute effective capacity at each voltage
+        voltage_capacities_power_energy(j,4,i) = (num_blocks - voltage_capacities_power_energy(j,2,i)) * vdd_power_energy(j,2) + vdd_power_energy(j,3); % compute total cache static power at each voltage, accounting for unique faulty block locations
+        voltage_capacities_power_energy(j,5,i) = vdd_power_energy(j,4); % copy total cache dynamic energy per access
     end
 end
     
@@ -79,9 +88,9 @@ for i=1:N % Loop over each faultmap
             % Find lowest voltage
             % that meets capacity constraint for that
             % runtime VDD.
-            if voltage_capacities(k,3,i) < capacity_levels(j) % Constraint violated. Pick the next candidate voltage above it.
+            if voltage_capacities_power_energy(k,3,i) < capacity_levels(j) % Constraint violated. Pick the next candidate voltage above it.
                 if j > 1 % account for special case bounds check. If this fails, we should get a NaN returned indicating a problem.
-                    runtime_vdds(j,1,i) = voltage_capacities(k-1,1,i);
+                    runtime_vdds(j,1,i) = voltage_capacities_power_energy(k-1,1,i);
                     if runtime_vdds(j,1,i) < vdd_mins(i) % Yield min-VDD constraint.
                         runtime_vdds(j,1,i) = vdd_mins(i);
                         yield_limited(j,1,i) = 1;
