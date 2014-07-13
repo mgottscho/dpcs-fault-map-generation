@@ -42,7 +42,6 @@ N = size(runtime_vdds,3);
 runtime_gem5_data = NaN(L,3,N); % col 1: vdd, col 2: total cache static power, col 3: total cache dynamic energy per access
 
 for i=1:N % for each faultmap
-    display 'Alive...'
     runtime_gem5_data(:,1,i) = runtime_vdds(:,1,i); % copy runtime voltages for the faultmap
     for j=1:L % for each runtime voltage in the faultmap, copy the corresponding cache static power and dynamic energy over
         for k=1:size(voltage_capacities_power_energy,1) % for each possible voltage
