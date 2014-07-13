@@ -5,7 +5,7 @@ function [] = export_runtime_vdds(runtime_vdds, voltage_capacities_power_energy,
 % Writes a set of runtime VDDs to CSV files.
 %
 % Arguments:
-%   runtime_vdds -- 1xLxN Matrix: each element in a Z-plane corresponds to a runtime
+%   runtime_vdds -- Lx1xN Matrix: each element in a Z-plane corresponds to a runtime
 %       supply voltage for the respective faultmap.
 %   voltage_capacities_power_energy -- Vx5xN Matrix: Rows correspond to all
 %       possible operating VDD levels as seen by their occurrences in the
@@ -36,18 +36,19 @@ function [] = export_runtime_vdds(runtime_vdds, voltage_capacities_power_energy,
 %   faultmaps/runtime-vdds-L2-foo-4.csv
 %   faultmaps/runtime-vdds-L2-foo-5.csv
 
-L = size(runtime_vdds,2);
+L = size(runtime_vdds,1);
 N = size(runtime_vdds,3);
 
-runtime_gem5_data = NaN(3,L,N); % row 1: vdd, row 2: total cache static power, row 3: total cache dynamic energy per access
+runtime_gem5_data = NaN(L,3,N); % col 1: vdd, col 2: total cache static power, col 3: total cache dynamic energy per access
 
 for i=1:N % for each faultmap
-    runtime_gem5_data(1,:,i) = runtime_vdds(1,:,i); % copy runtime voltages for the faultmap
+    display 'Alive...'
+    runtime_gem5_data(:,1,i) = runtime_vdds(:,1,i); % copy runtime voltages for the faultmap
     for j=1:L % for each runtime voltage in the faultmap, copy the corresponding cache static power and dynamic energy over
-        for k=1:size(voltage_capacities_power_energy,1) % for each
-            if runtime_vdds(1,j,i) == voltage_capacities_power_energy(k,1,i) % if voltage matches
-                runtime_gem5_data(2,j,i) = voltage_capacities_power_energy(k,4,i); % copy static power
-                runtime_gem5_data(3,j,i) = voltage_capacities_power_energy(k,5,i); % copy dynamic energy
+        for k=1:size(voltage_capacities_power_energy,1) % for each possible voltage
+            if runtime_vdds(j,1,i) == voltage_capacities_power_energy(k,1,i) % if voltage matches
+                runtime_gem5_data(j,2,i) = voltage_capacities_power_energy(k,4,i); % copy static power
+                runtime_gem5_data(j,3,i) = voltage_capacities_power_energy(k,5,i); % copy dynamic energy
             end
         end
     end

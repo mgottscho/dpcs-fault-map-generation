@@ -125,4 +125,4 @@ export_runtime_vdds(runtime_vdds_L2_A, voltage_capacities_power_energy_L2_A, sel
 export_runtime_vdds(runtime_vdds_L1_B, voltage_capacities_power_energy_L1_B, selected_indices_L1_B, 'faultmaps', 'L1', 'B');
 export_runtime_vdds(runtime_vdds_L2_B, voltage_capacities_power_energy_L2_B, selected_indices_L2_B, 'faultmaps', 'L2', 'B');
 
-display('DONE!');
+display('DONE! You may want to save the workspace, but it could be huge.');
